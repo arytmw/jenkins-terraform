@@ -1,5 +1,5 @@
 pipeline {
-    agent {label 'terraform-node'}
+    agent any
 
     stages {
         stage('Checkout') {
@@ -10,17 +10,17 @@ pipeline {
     
         stage ("terraform init") {
             steps {
-                sh ("terraform init -reconfigure") 
+                sh ("terraform init -upgrade") 
             }
         }
         
         stage ("plan") {
             steps {
-                sh ('terraform plan') 
+                sh ('terraform plan -out main.tfplan') 
             }
         }
 
-        stage (" Action") {
+        stage ("Action") {
             steps {
                 echo "Terraform action is --> ${action}"
                 sh ('terraform ${action} --auto-approve') 

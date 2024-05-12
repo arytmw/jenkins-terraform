@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_instance" "example" {
-  ami           = "ami-0c55b159cbfafe1f0" // Ubuntu 20.04 LTS (HVM), SSD Volume Type
+  ami           = "ami-04b70fa74e45c3917" // Ubuntu 20.04 LTS (HVM), SSD Volume Type
   instance_type = "t2.micro"
   
   tags = {

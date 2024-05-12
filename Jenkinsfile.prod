@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        AWS_CREDENTIALS = credentials('your-aws-credentials-id') // Jenkins credential ID for AWS credentials
+        AWS_CREDENTIALS = credentials('aws-networknuts') // Jenkins credential ID for AWS credentials
     }
     
     stages {

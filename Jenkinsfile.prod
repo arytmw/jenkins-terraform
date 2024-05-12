@@ -13,7 +13,7 @@ pipeline {
                     sh """
                     aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
                     aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-                    aws configure set default.region YOUR_AWS_REGION
+                    aws configure set default.region ap-south-1
                     """
                 }
             }
@@ -22,7 +22,8 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout your source code repository
-                git 'https://github.com/your/repository.git'
+                git branch: "master",
+                    url: "https://github.com/arytmw/jenkins-terraform.git"
             }
         }
         
@@ -30,7 +31,7 @@ pipeline {
             steps {
                 // Ensure Terraform is initialized
                 script {
-                    sh "terraform init -input=false -backend-config='bucket=my-terraform-state-bucket' -backend-config='key=my-terraform-state-key'"
+                    sh "terraform init"
                 }
             }
         }
@@ -66,7 +67,7 @@ pipeline {
             steps {
                 // Upload the Terraform state file to S3
                 script {
-                    sh 'aws s3 cp tfplan s3://my-terraform-state-bucket/'
+                    sh 'aws s3 cp tfplan s3://jenkins-networknuts/'
                 }
             }
         }
@@ -75,13 +76,6 @@ pipeline {
             steps {
                 // Execute deployment scripts or commands (if needed)
                 sh 'echo "Deployment complete"'
-            }
-        }
-        
-        stage('Cleanup') {
-            steps {
-                // Cleanup or post-deployment tasks
-                sh 'echo "Cleanup complete"'
             }
         }
     }

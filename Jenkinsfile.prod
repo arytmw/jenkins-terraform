@@ -1,0 +1,88 @@
+pipeline {
+    agent any
+    
+    environment {
+        AWS_CREDENTIALS = credentials('your-aws-credentials-id') // Jenkins credential ID for AWS credentials
+    }
+    
+    stages {
+        stage('Setup') {
+            steps {
+                // Set AWS credentials from Jenkins credentials
+                withCredentials([usernamePassword(credentialsId: 'your-aws-credentials-id', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    sh """
+                    aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+                    aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+                    aws configure set default.region YOUR_AWS_REGION
+                    """
+                }
+            }
+        }
+        
+        stage('Checkout') {
+            steps {
+                // Checkout your source code repository
+                git 'https://github.com/your/repository.git'
+            }
+        }
+        
+        stage('Terraform Init') {
+            steps {
+                // Ensure Terraform is initialized
+                script {
+                    sh "terraform init -input=false -backend-config='bucket=my-terraform-state-bucket' -backend-config='key=my-terraform-state-key'"
+                }
+            }
+        }
+        
+        stage('Terraform Validate') {
+            steps {
+                // Validate Terraform configurations
+                script {
+                    sh 'terraform validate'
+                }
+            }
+        }
+        
+        stage('Terraform Plan') {
+            steps {
+                // Generate and show Terraform execution plan
+                script {
+                    sh 'terraform plan -out=tfplan'
+                }
+            }
+        }
+        
+        stage('Terraform Apply') {
+            steps {
+                // Apply Terraform changes (with auto-approval)
+                script {
+                    sh 'terraform apply -auto-approve tfplan'
+                }
+            }
+        }
+        
+        stage('Upload State to S3') {
+            steps {
+                // Upload the Terraform state file to S3
+                script {
+                    sh 'aws s3 cp tfplan s3://my-terraform-state-bucket/'
+                }
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                // Execute deployment scripts or commands (if needed)
+                sh 'echo "Deployment complete"'
+            }
+        }
+        
+        stage('Cleanup') {
+            steps {
+                // Cleanup or post-deployment tasks
+                sh 'echo "Cleanup complete"'
+            }
+        }
+    }
+}

@@ -75,7 +75,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 // Execute deployment scripts or commands (if needed)
-                sh 'echo "Deployment complete"'
+                sh 'echo "Terraform Deployment complete"'
             }
         }
     }
